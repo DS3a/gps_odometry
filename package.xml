@@ -1,0 +1,18 @@
+<package format="3">
+  <name>gps_odometry</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="padaladeepesh@gmail.com">user</maintainer>
+  <license>TODO: License declaration</license>
+
+  <build_depend>rclrs</build_depend>
+  <build_depend>rosidl_runtime_rs</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <exec_depend>rclrs</exec_depend>
+  <exec_depend>rosidl_runtime_rs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <export>
+    <build_type>ament_cargo</build_type>
+  </export>
+</package>

@@ -1,0 +1,38 @@
+[package]
+name = "gps_odometry"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "gps_odometry"
+path = "src/gps_odometry.rs"
+
+[[bin]]
+name = "gps_odometry_node"
+path = "src/gps_odometry_node.rs"
+
+[dependencies]
+utm = "0.1.5"
+anyhow = {version = "1", features = ["backtrace"]}
+ndarray = "*"
+nalgebra = "*"
+
+[dependencies.rclrs]
+version = "*"
+
+[dependencies.std_msgs]
+version = "*"
+
+[dependencies.geometry_msgs]
+version = "*"
+
+[dependencies.nav_msgs]
+version = "*"
+
+[dependencies.sensor_msgs]
+version = "*"
+
+[dependencies.rosidl_runtime_rs]
+version = "*"
