@@ -1,6 +1,6 @@
 use utm;
 use ndarray::arr2;
-use nalgebra::Vector2;
+use nalgebra::{Vector2, Matrix2};
 use std::sync::Mutex;
 
 pub struct Odometry {
@@ -27,23 +27,29 @@ impl Odometry {
             datum_northing,
             datum_easting,
             position: Mutex::new(datum_position),
-            yaw: Mutex::new(datum_heading),
+            yaw: Mutex::new(datum_heading), // can't get this
         }
     }
 
-    pub fn transform_utm_to_local_frames(&self, relative_northing: f64, relative_easting: f64) -> (f64, f64) {
+    pub fn transform_utm_to_local_frames(&self, relative_northing: f64, relative_easting: f64) -> Vector2<f64> {
         /*
          * returns (x, y)
          * X-axis => North axis
          * Y-axis => East axis
          */
 
-        (0f64, 0f64)
-
+        let inv_heading = -self.datum_heading;
+        let cosine = inv_heading.cos();
+        let sine = inv_heading.sin();
+        Matrix2::new(cosine, -sine, sine, cosine) * Vector2::new(relative_northing, relative_easting)
     }
 
     pub fn update_odom(&self, lat: f64, long: f64) {
         let (northing, easting, _meridian_convergence) = utm::to_utm_wgs84_no_zone(lat, long);
+        let relative_northing = northing - self.datum_northing;
+        let relative_easting = easting - self.datum_easting;
+        let transformation = self.transform_utm_to_local_frames(relative_northing, relative_easting);
+        *self.position.lock().unwrap() += transformation;
     }
 }
 
@@ -59,9 +65,14 @@ pub fn get_heading(mag_x: f64, mag_y: f64) -> f64 {
     // S = 180 degrees
     // E = -90 degrees
 
+
     // TODO add magnetic declination based on current lat long etc.
     // output in radians
-    -mag_y.atan2(mag_x)
+    let heading = -mag_y.atan2(mag_x);
+
+    static utm_to_map: Matrix2<f64> = Matrix2::new(1f64, 1f64, 1f64, 1f64);
+
+    return heading;
 }
 
 
