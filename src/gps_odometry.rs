@@ -3,6 +3,8 @@ use ndarray::arr2;
 use nalgebra::{Vector2, Matrix2};
 use std::sync::Mutex;
 
+// TODO verify axes
+
 pub struct Odometry {
     datum_position: Vector2<f64>,
     datum_heading: f64, // in radians
@@ -20,14 +22,14 @@ impl Odometry {
             = utm::to_utm_wgs84_no_zone(datum_lat, datum_long);
 
         Self {
-            datum_position,
+            datum_position, // is this required?
             datum_heading,
             datum_lat,
             datum_long,
             datum_northing,
             datum_easting,
-            position: Mutex::new(datum_position),
-            yaw: Mutex::new(datum_heading), // can't get this
+            position: Mutex::new(Vector2::new(0f64, 0f64)),
+            yaw: Mutex::new(datum_heading), // is this required?
         }
     }
 
