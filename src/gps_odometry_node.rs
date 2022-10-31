@@ -54,8 +54,14 @@ fn main() -> Result<(), Error> {
         if let Some(gnss_msg) = &*gnss_msg_global_handler.lock().unwrap() {
             if let Some(mag_msg) = &*mag_msg_global_handler.lock().unwrap() {
                 // TODO get yaw heading from `gps_odometry::get_heading`
-                gps_odometry_opt = Option::<gps_odometry::Odometry>::None;
+                // done
+                let datum_heading = gps_odometry::get_heading(mag_msg.magnetic_field.x,
+                                                              mag_msg.magnetic_field.y);
+                let (lat, long) = (gnss_msg.latitude, gnss_msg.longitude);
+                // gps_odometry_opt = Option::<gps_odometry::Odometry>::None;
                 // TODO replace this       ^^^^ with the init method
+                // done
+                gps_odometry_opt = Some(gps_odometry::Odometry::new(datum_heading, lat, long));
                 break;
             }
         }
@@ -72,8 +78,16 @@ fn main() -> Result<(), Error> {
             if let Some(gnss_msg) = &*gnss_msg_global_handler.lock().unwrap() {
                 odom_msg.header.stamp.sec = gnss_msg.header.stamp.sec;
                 odom_msg.header.stamp.nanosec = gnss_msg.header.stamp.nanosec;
-                // TODO call function that modifies odom based on the gnss msg
-                // TODO update odom_msg based on what is given out by gps_odometry_opt
+               if let Some(gps_odometry_instance) = &gps_odometry_opt {
+                   // TODO call function that modifies odom based on the gnss msg
+                   // done
+                   gps_odometry_instance.update_odom(gnss_msg.latitude, gnss_msg.longitude);
+                   // TODO update odom_msg based on what is given out by gps_odometry_opt
+                   // done
+                   let position = *gps_odometry_instance.position.lock().unwrap();
+                   odom_msg.pose.pose.position.x = position.x;
+                   odom_msg.pose.pose.position.y = position.y;
+               }
             }
             odom_publisher.publish(&*odom_msg).unwrap();
             println!("{:?}", &odom_msg.header.stamp.sec);

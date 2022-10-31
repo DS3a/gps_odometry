@@ -823,6 +823,10 @@ name = "examples_rclrs_minimal_pub_sub"
 version = "0.2.0"
 
 [[patch.unused]]
+name = "f767_embedded_server"
+version = "0.1.0"
+
+[[patch.unused]]
 name = "gps_odometry"
 version = "0.1.0"
 

@@ -6,30 +6,30 @@ use std::sync::Mutex;
 // TODO verify axes
 
 pub struct Odometry {
-    datum_position: Vector2<f64>,
+    // datum_position: Vector2<f64>,
     datum_heading: f64, // in radians
     datum_lat: f64,
     datum_long: f64,
     datum_northing: f64,
     datum_easting: f64,
-    position: Mutex<Vector2<f64>>,
-    yaw: Mutex<f64>,
+    pub position: Mutex<Vector2<f64>>,
+    // yaw: Mutex<f64>,
 }
 
 impl Odometry {
-    pub fn new(datum_position: Vector2<f64>, datum_heading: f64, datum_lat: f64, datum_long: f64) -> Self {
+    pub fn new(datum_heading: f64, datum_lat: f64, datum_long: f64) -> Self {
         let (datum_northing, datum_easting, _initial_meridian_convergence)
             = utm::to_utm_wgs84_no_zone(datum_lat, datum_long);
 
         Self {
-            datum_position, // is this required?
+            // datum_position, // is this required?
             datum_heading,
             datum_lat,
             datum_long,
             datum_northing,
             datum_easting,
             position: Mutex::new(Vector2::new(0f64, 0f64)),
-            yaw: Mutex::new(datum_heading), // is this required?
+            // yaw: Mutex::new(datum_heading), // is this required?
         }
     }
 
@@ -50,9 +50,10 @@ impl Odometry {
         let (northing, easting, _meridian_convergence) = utm::to_utm_wgs84_no_zone(lat, long);
         let relative_northing = northing - self.datum_northing;
         let relative_easting = easting - self.datum_easting;
-        let transformation = self.transform_utm_to_local_frames(relative_northing, relative_easting);
-        *self.position.lock().unwrap() += transformation;
+        let translation = self.transform_utm_to_local_frames(relative_northing, relative_easting);
+        *self.position.lock().unwrap() += translation;
     }
+
 }
 
 /*
