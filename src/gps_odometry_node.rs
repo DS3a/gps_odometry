@@ -52,7 +52,9 @@ fn main() -> Result<(), Error> {
 
     loop {
         if let Some(gnss_msg) = &*gnss_msg_global_handler.lock().unwrap() {
+            println!("got datum lat long");
             if let Some(mag_msg) = &*mag_msg_global_handler.lock().unwrap() {
+                println!("got datum yaw");
                 // TODO get yaw heading from `gps_odometry::get_heading`
                 // done
                 let datum_heading = gps_odometry::get_heading(mag_msg.magnetic_field.x,
