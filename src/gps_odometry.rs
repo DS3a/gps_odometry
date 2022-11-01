@@ -40,18 +40,19 @@ impl Odometry {
          * Y-axis => East axis
          */
 
-        let inv_heading = -self.datum_heading;
-        let cosine = inv_heading.cos();
-        let sine = inv_heading.sin();
+        let heading = -self.datum_heading;
+        let cosine = heading.cos();
+        let sine = heading.sin();
         Matrix2::new(cosine, -sine, sine, cosine) * Vector2::new(relative_northing, relative_easting)
     }
+    // c, s, -s, c gives (-22, 13)
 
     pub fn update_odom(&self, lat: f64, long: f64) {
         let (northing, easting, _meridian_convergence) = utm::to_utm_wgs84_no_zone(lat, long);
         let relative_northing = northing - self.datum_northing;
         let relative_easting = easting - self.datum_easting;
         let translation = self.transform_utm_to_local_frames(relative_northing, relative_easting);
-        *self.position.lock().unwrap() += translation;
+        *self.position.lock().unwrap() = translation;
     }
 
 }

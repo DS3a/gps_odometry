@@ -18,7 +18,7 @@ fn main() -> Result<(), Error> {
     let gnss_msg_global_handler = Arc::new(Mutex::new(Option::<NavSatFixMsg>::None));
     let imu_msg_global_handler = Arc::new(Mutex::new(ImuMsg::default()));
     let mag_msg_global_handler = Arc::new(Mutex::new(Option::<MagneticFieldMsg>::None));
-    let odom_msg_global_handler = Arc::new(Mutex::new(Option::<OdometryMsg>::None));
+    let odom_msg_global_handler = Arc::new(Mutex::new(Some(OdometryMsg::default())));
 
 
     // this channel will be used to wake up the thread that will be used to unfreeze the odom publisher thread whenever a gps ping is recieved
@@ -71,13 +71,17 @@ fn main() -> Result<(), Error> {
         thread::sleep(std::time::Duration::from_millis(500));
     }
 
+    println!("ready to start publishing odom");
     while context.ok() {
         // locks the thread till a new gps ping is received
+        println!("waiting for gps ping");
         gps_msg_rx.recv().unwrap();
-
+        println!("got gps ping, calculating new odom");
         // blocks the thread until a message is received by gps callback
         if let Some(odom_msg) = &mut *odom_msg_global_handler.lock().unwrap() {
+            println!("got odom msg, now waiting for gnss msg");
             if let Some(gnss_msg) = &*gnss_msg_global_handler.lock().unwrap() {
+                println!("got gnss msg, now waiting for odom instance");
                 odom_msg.header.stamp.sec = gnss_msg.header.stamp.sec;
                 odom_msg.header.stamp.nanosec = gnss_msg.header.stamp.nanosec;
                if let Some(gps_odometry_instance) = &gps_odometry_opt {
@@ -89,10 +93,10 @@ fn main() -> Result<(), Error> {
                    let position = *gps_odometry_instance.position.lock().unwrap();
                    odom_msg.pose.pose.position.x = position.x;
                    odom_msg.pose.pose.position.y = position.y;
+                   println!("sending odom");
+                   odom_publisher.publish(&*odom_msg).unwrap();
                }
             }
-            odom_publisher.publish(&*odom_msg).unwrap();
-            println!("{:?}", &odom_msg.header.stamp.sec);
         }
     }
     Ok(())
