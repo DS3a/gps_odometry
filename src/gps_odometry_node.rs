@@ -16,7 +16,6 @@ fn main() -> Result<(), Error> {
     let context = rclrs::Context::new(env::args())?;
 
     let gnss_msg_global_handler = Arc::new(Mutex::new(Option::<NavSatFixMsg>::None));
-    let imu_msg_global_handler = Arc::new(Mutex::new(ImuMsg::default()));
     let mag_msg_global_handler = Arc::new(Mutex::new(Option::<MagneticFieldMsg>::None));
     let odom_msg_global_handler = Arc::new(Mutex::new(Some(OdometryMsg::default())));
 
@@ -32,11 +31,6 @@ fn main() -> Result<(), Error> {
     let _gnss_subscriber = node.create_subscription::<NavSatFixMsg,  _>("/gnss", rclrs::QOS_PROFILE_DEFAULT, move |msg: NavSatFixMsg| {
         *gnss_msg_subscriber_handler.lock().unwrap() = Some(msg);
         gps_msg_tx.send(true).unwrap();
-    });
-
-    let imu_msg_subscriber_handler = Arc::clone(&imu_msg_global_handler);
-    let _imu_subscriber = node.create_subscription::<ImuMsg, _>("/imu/filtered", rclrs::QOS_PROFILE_DEFAULT, move |msg: ImuMsg| {
-        *imu_msg_subscriber_handler.lock().unwrap() = msg;
     });
 
     let mag_msg_subscriber_handler = Arc::clone(&mag_msg_global_handler);
@@ -55,14 +49,13 @@ fn main() -> Result<(), Error> {
             println!("got datum lat long");
             if let Some(mag_msg) = &*mag_msg_global_handler.lock().unwrap() {
                 println!("got datum yaw");
-                // TODO get yaw heading from `gps_odometry::get_heading`
+                // done TODO get yaw heading from `gps_odometry::get_heading`
                 // done
                 let datum_heading = gps_odometry::get_heading(mag_msg.magnetic_field.x,
                                                               mag_msg.magnetic_field.y);
                 let (lat, long) = (gnss_msg.latitude, gnss_msg.longitude);
                 // gps_odometry_opt = Option::<gps_odometry::Odometry>::None;
-                // TODO replace this       ^^^^ with the init method
-                // done
+                // done TODO replace this       ^^^^ with the init method
                 gps_odometry_opt = Some(gps_odometry::Odometry::new(datum_heading, lat, long));
                 break;
             }

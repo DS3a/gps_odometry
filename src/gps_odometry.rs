@@ -3,7 +3,8 @@ use ndarray::arr2;
 use nalgebra::{Vector2, Matrix2};
 use std::sync::Mutex;
 
-// TODO verify axes
+// done TODO verify axes
+// TODO add magnetic declination somewhere
 
 pub struct Odometry {
     // datum_position: Vector2<f64>,
@@ -41,7 +42,6 @@ impl Odometry {
          */
 
         let heading = -1f64 * self.datum_heading;
-        // TODO add magnetic declination here
         let cosine = heading.cos();
         let sine = heading.sin();
         Matrix2::new(-1f64, 0f64, 0f64, 1f64) * Matrix2::new(cosine, -sine, sine, cosine) * Vector2::new(relative_northing, relative_easting)
@@ -59,9 +59,6 @@ impl Odometry {
 
 }
 
-/*
-TODO decide if magnetometer can be used to get stuff done or if odometry has to be used
-*/
 pub fn get_heading(mag_x: f64, mag_y: f64) -> f64 {
     // angle with respect to north
     // CW = +ve ??
@@ -88,6 +85,4 @@ pub fn get_heading(mag_x: f64, mag_y: f64) -> f64 {
 pub fn map_to_utm_tf(map_x: f64, map_y: f64, utm_n: f64, utm_e: f64) -> f64 {
     0.0f64
 }
-
-// TODO function to get the x and y in map frame given northing and easting
 
