@@ -16,7 +16,6 @@ path = "src/gps_odometry_node.rs"
 [dependencies]
 utm = "0.1.5"
 anyhow = {version = "1", features = ["backtrace"]}
-ndarray = "*"
 nalgebra = "*"
 
 [dependencies.rclrs]
