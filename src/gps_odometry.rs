@@ -40,10 +40,11 @@ impl Odometry {
          * Y-axis => East axis
          */
 
-        let heading = -self.datum_heading;
+        let heading = -1f64 * self.datum_heading;
+        // TODO add magnetic declination here
         let cosine = heading.cos();
         let sine = heading.sin();
-        Matrix2::new(cosine, -sine, sine, cosine) * Vector2::new(relative_northing, relative_easting)
+        Matrix2::new(-1f64, 0f64, 0f64, 1f64) * Matrix2::new(cosine, -sine, sine, cosine) * Vector2::new(relative_northing, relative_easting)
     }
     // c, s, -s, c gives (-22, 13)
 

@@ -94,6 +94,7 @@ fn main() -> Result<(), Error> {
                    odom_msg.pose.pose.position.x = position.x;
                    odom_msg.pose.pose.position.y = position.y;
                    println!("sending odom");
+                   println!("Current position: {}, {}", position.x, position.y);
                    odom_publisher.publish(&*odom_msg).unwrap();
                }
             }
