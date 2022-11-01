@@ -49,7 +49,8 @@ impl Odometry {
     // c, s, -s, c gives (-22, 13)
 
     pub fn update_odom(&self, lat: f64, long: f64) {
-        let (northing, easting, _meridian_convergence) = utm::to_utm_wgs84_no_zone(lat, long);
+        let (northing, easting, meridian_convergence) = utm::to_utm_wgs84_no_zone(lat, long);
+        println!("magnetic declination: {}", meridian_convergence);
         let relative_northing = northing - self.datum_northing;
         let relative_easting = easting - self.datum_easting;
         let translation = self.transform_utm_to_local_frames(relative_northing, relative_easting);
@@ -90,5 +91,3 @@ pub fn map_to_utm_tf(map_x: f64, map_y: f64, utm_n: f64, utm_e: f64) -> f64 {
 
 // TODO function to get the x and y in map frame given northing and easting
 
-
-// NO clue how to proceed
