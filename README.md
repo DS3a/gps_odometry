@@ -1,8 +1,8 @@
 RIIR of navsat_transform_node
 
-##inputs required:<br>
+## inputs required:<br>
 /gnss -> gps topic<br>
 /imu/mag -> imu magnetometer topic
 
-##outputs:<br>
+# outputs:<br>
 /odometry/gps -> gps odometry topic
